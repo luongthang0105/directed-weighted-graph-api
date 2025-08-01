@@ -5,6 +5,7 @@
 //       ... this won't just compile
 //       straight away
 namespace gdwg {
+	template<typename N, typename E>
 	class Edge {
 	 public:
 	 private:
@@ -21,6 +22,8 @@ namespace gdwg {
 	 public:
 	 private:
 	};
+
+	template<typename N, typename E>
 	class Graph {
 	 public:
 		// Your member functions go here
