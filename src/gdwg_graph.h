@@ -10,6 +10,7 @@ namespace gdwg {
 	 public:
 	 private:
 		// You may need to add data members and member functions
+		template<typename G_N, typename G_E>
 		friend class Graph;
 	};
 
