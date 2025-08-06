@@ -19,6 +19,15 @@ namespace gdwg {
 	}
 
 	template<typename N, typename E>
+	Graph<N, E>::Graph(Graph&& other) noexcept {
+		std::swap(nodes_, other.nodes_);
+		std::swap(adjacencyList_, other.adjacencyList_);
+
+		other.adjacencyList_.clear();
+		other.nodes_.clear();
+	}
+
+	template<typename N, typename E>
 	auto Graph<N, E>::ValueComparator::operator()(std::unique_ptr<N> a, std::unique_ptr<N> b) const -> bool {
 		return *a < *b;
 	}
