@@ -1,14 +1,15 @@
 #include "gdwg_graph.h"
+#include <utility>
 
 namespace gdwg {
 	template<typename N, typename E>
 	Graph<N, E>::Graph()
 	: nodes_{}
-	, adjacencyList_{} {};
+	, adjacencyList_{} {}
 
 	template<typename N, typename E>
 	Graph<N, E>::Graph(std::initializer_list<N> il)
-	: Graph(il.begin(), il.end()){};
+	: Graph(il.begin(), il.end()) {}
 
 	template<typename N, typename E>
 	template<typename InputIt>
@@ -19,12 +20,23 @@ namespace gdwg {
 	}
 
 	template<typename N, typename E>
-	Graph<N, E>::Graph(Graph&& other) noexcept {
+	Graph<N, E>::Graph(Graph&& other) noexcept
+	: nodes_(std::exchange(other.nodes_, {}))
+	, adjacencyList_(std::exchange(other.adjacencyList_, {})) {}
+
+	template<typename N, typename E>
+	auto Graph<N, E>::operator=(Graph&& other) noexcept -> Graph& {
+		if (this == &other) {
+			return *this;
+		}
+
 		std::swap(nodes_, other.nodes_);
 		std::swap(adjacencyList_, other.adjacencyList_);
 
 		other.adjacencyList_.clear();
 		other.nodes_.clear();
+
+		return *this;
 	}
 
 	template<typename N, typename E>
