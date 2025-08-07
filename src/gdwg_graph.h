@@ -104,10 +104,10 @@ namespace gdwg {
 		};
 
 		auto swap(Graph& other) noexcept -> void;
+		using edge_set = std::set<std::unique_ptr<Edge<N, E>>, typename Edge<N, E>::UniquePtrEdgeComparator>;
 
 		std::set<std::unique_ptr<N>, UniquePtrValueComparator> nodes_;
-		std::map<N*, std::set<std::unique_ptr<Edge<N, E>>, typename Edge<N, E>::UniquePtrEdgeComparator>, RawPtrValueComparator>
-		    adjacency_list_;
+		std::map<N*, edge_set, RawPtrValueComparator> adjacency_list_;
 	};
 } // namespace gdwg
 
