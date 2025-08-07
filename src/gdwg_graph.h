@@ -100,7 +100,7 @@ namespace gdwg {
 		};
 
 		struct RawPtrValueComparator {
-			auto operator()(const N*& a, const N*& b) const -> bool;
+			auto operator()(const N* a, const N* b) const -> bool;
 		};
 
 		auto swap(Graph& other) noexcept -> void;
