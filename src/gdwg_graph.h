@@ -85,6 +85,7 @@ namespace gdwg {
 		auto insert_node(N const& value) -> bool;
 
 		// =================ACCESSORS===================
+		[[nodiscard]] auto is_node(N const& value) -> bool;
 		[[nodiscard]] auto empty() -> bool;
 
 		// =================COMPARISONS===================
@@ -106,5 +107,43 @@ namespace gdwg {
 		    adjacency_list_;
 	};
 } // namespace gdwg
+
+namespace gdwg {
+	template<typename N, typename E>
+	Graph<N, E>::Graph()
+	: nodes_{}
+	, adjacency_list_{} {}
+
+	template<typename N, typename E>
+	Graph<N, E>::Graph(std::initializer_list<N> il)
+	: Graph(il.begin(), il.end()) {}
+
+	template<typename N, typename E>
+	template<typename InputIt>
+	Graph<N, E>::Graph(InputIt first, InputIt last) {
+		for (auto it = first; it != last; ++it) {
+			insert_node(*it);
+		}
+	}
+
+	template<typename N, typename E>
+	Graph<N, E>::Graph(Graph&& other) noexcept
+	: nodes_(std::exchange(other.nodes_, {}))
+	, adjacency_list_(std::exchange(other.adjacency_list_, {})) {}
+
+	template<typename N, typename E>
+	auto Graph<N, E>::operator=(Graph&& other) noexcept -> Graph& {
+		if (this == &other) {
+			return *this;
+		}
+
+		std::swap(nodes_, other.nodes_);
+		std::swap(adjacency_list_, other.adjacency_list_);
+
+		other.adjacency_list_.clear();
+		other.nodes_.clear();
+
+		return *this;
+	}
 
 #endif // GDWG_GRAPH_H
