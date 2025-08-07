@@ -42,6 +42,8 @@ namespace gdwg {
 		Graph(Graph const& other);
 		auto operator=(Graph const& other) -> Graph&;
 
+		~Graph() = default;
+
 		// =================MODIFIERS===================
 		auto insert_node(N const& value) -> bool;
 
@@ -53,8 +55,10 @@ namespace gdwg {
 			auto operator()(std::unique_ptr<N> a, std::unique_ptr<N> b) const -> bool;
 		};
 
+		auto swap(Graph& other) noexcept -> void;
+
 		std::set<std::unique_ptr<N>, ValueComparator> nodes_;
-		std::map<N*, std::set<Edge<N, E>>> adjacencyList_;
+		std::map<N*, std::set<std::unique_ptr<Edge<N, E>>>> adjacency_list_;
 	};
 } // namespace gdwg
 
