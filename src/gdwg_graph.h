@@ -274,13 +274,52 @@ namespace gdwg {
 	}
 
 	template<typename N, typename E>
+	Edge<N, E>::Edge(N const& src, N const& dst)
+	: src_{&src}
+	, dst_{&dst} {}
+
+	template<typename N, typename E>
+	Edge<N, E>::Edge(Edge const& other)
+	: src_{other.src_}
+	, dst_{other.dst_} {}
+
+	template<typename N, typename E>
+	auto Edge<N, E>::get_nodes() -> std::pair<N, N> {
+		return std::make_pair(*src_, *dst_);
+	}
+
+	template<typename N, typename E>
 	[[nodiscard]] auto Edge<N, E>::operator==(Edge const& other) -> bool {
 		if (*src_ != *other.src_)
 			return false;
 		if (*dst_ != *other.dst_)
 			return false;
-		if (!get_weight().has_value() && !other.get_weight().has_value())
-			return true;
+
+		return get_weight() == other.get_weight();
+	}
+
+	template<typename N, typename E>
+	WeightedEdge<N, E>::WeightedEdge(N const& src, N const& dst, E const& weight)
+	: Edge<N, E>(src, dst)
+	, weight_{std::make_unique<E>(weight)} {}
+
+	template<typename N, typename E>
+	WeightedEdge<N, E>::WeightedEdge(WeightedEdge const& other)
+	: Edge<N, E>(other)
+	, weight_{std::make_unique<E>(other.weight_)} {}
+
+	template<typename N, typename E>
+	auto WeightedEdge<N, E>::print_edge() -> std::string {
+		auto ss = std::stringstream{};
+		ss << *(this->src_) << " -> ";
+		ss << *(this->dst_) << " | W | ";
+		ss << *weight_;
+		return ss.str();
+	}
+
+	template<typename N, typename E>
+	auto WeightedEdge<N, E>::is_weighted() -> bool {
+		return true;
 	}
 
 	template<typename N, typename E>
