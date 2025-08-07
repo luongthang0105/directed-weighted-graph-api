@@ -21,6 +21,12 @@ namespace gdwg {
 
 		virtual ~Edge() = default;
 
+		[[nodiscard]] auto operator==(Edge const& other) -> bool;
+
+		struct UniquePtrEdgeComparator {
+			auto operator()(const std::unique_ptr<Edge<N, E>>& a, const std::unique_ptr<Edge<N, E>>& b) const -> bool;
+		};
+
 	 private:
 		template<typename G_N, typename G_E>
 		friend class Graph;
@@ -87,13 +93,14 @@ namespace gdwg {
 		};
 
 		struct RawPtrValueComparator {
-			auto operator()(N* a, N* b) const -> bool;
+			auto operator()(const N*& a, const N*& b) const -> bool;
 		};
 
 		auto swap(Graph& other) noexcept -> void;
 
 		std::set<std::unique_ptr<N>, UniquePtrValueComparator> nodes_;
-		std::map<N*, std::set<std::unique_ptr<Edge<N, E>>>, RawPtrValueComparator> adjacency_list_;
+		std::map<N*, std::set<std::unique_ptr<Edge<N, E>>, typename Edge<N, E>::UniquePtrEdgeComparator>, RawPtrValueComparator>
+		    adjacency_list_;
 	};
 } // namespace gdwg
 
