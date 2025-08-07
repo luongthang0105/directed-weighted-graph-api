@@ -49,53 +49,56 @@
 // 				clone_edge_set.insert(*edge);
 // 			}
 
-			adjacency_list_.insert(std::make_pair(clone_node.get(), clone_edge_set));
-			nodes_.insert(std::move(clone_node));
-		}
-	}
+// 			adjacency_list_.insert(std::make_pair(clone_node.get(), clone_edge_set));
+// 			nodes_.insert(std::move(clone_node));
+// 		}
+// 	}
 
-	template<typename N, typename E>
-	auto Graph<N, E>::operator=(Graph const& other) -> Graph& {
-		if (this == &other) {
-			return *this;
-		}
+// 	template<typename N, typename E>
+// 	auto Graph<N, E>::operator=(Graph const& other) -> Graph& {
+// 		if (this == &other) {
+// 			return *this;
+// 		}
 
-		this.swap(Graph(other));
-		return *this;
-	}
+// 		this.swap(Graph(other));
+// 		return *this;
+// 	}
 
-	template<typename N, typename E>
-	auto Graph<N, E>::swap(Graph& other) noexcept -> void {
-		std::swap(nodes_, other.nodes_);
-		std::swap(adjacency_list_, other.adjacency_list_);
-	}
+// 	template<typename N, typename E>
+// 	auto Graph<N, E>::swap(Graph& other) noexcept -> void {
+// 		std::swap(nodes_, other.nodes_);
+// 		std::swap(adjacency_list_, other.adjacency_list_);
+// 	}
 
-	template<typename N, typename E>
-	auto Graph<N, E>::UniquePtrValueComparator::operator()(const std::unique_ptr<N>& a, const std::unique_ptr<N>& b) const
-	    -> bool {
-		return *a < *b;
-	}
+// 	template<typename N, typename E>
+// 	auto Graph<N, E>::UniquePtrValueComparator::operator()(const std::unique_ptr<N>& a, const std::unique_ptr<N>& b)
+// const
+// 	    -> bool {
+// 		return *a < *b;
+// 	}
 
-	template<typename N, typename E>
-	auto Graph<N, E>::RawPtrValueComparator::operator()(const N*& a, const N*& b) const -> bool {
-		return *a < *b;
-	}
+// 	template<typename N, typename E>
+// 	auto Graph<N, E>::RawPtrValueComparator::operator()(const N*& a, const N*& b) const -> bool {
+// 		return *a < *b;
+// 	}
 
-	template<typename N, typename E>
-	auto Graph<N, E>::insert_node(N const& value) -> bool {
-		if (nodes_.contains(value)) {
-			return false;
-		}
-		nodes_.insert(std::make_unique<N>(value));
-		return true;
-	}
+// 	// =================MODIFIERS===================
+// 	template<typename N, typename E>
+// 	auto Graph<N, E>::insert_node(N const& value) -> bool {
+// 		if (nodes_.contains(value)) {
+// 			return false;
+// 		}
+// 		nodes_.insert(std::make_unique<N>(value));
+// 		return true;
+// 	}
 
-	template<typename N, typename E>
-	[[nodiscard]] auto Graph<N, E>::operator==(Graph const& other) -> bool {
-		if (nodes_.size() != other.nodes_.size())
-			return false;
-		if (adjacency_list_.size() != other.adjacency_list_.size())
-			return false;
+// 	// =================ACCESSORS===================
+// 	template<typename N, typename E>
+// 	[[nodiscard]] auto Graph<N, E>::is_node(N const& value) -> bool {
+// 		auto const copied_value = value;
+// 		return nodes_.contains(std::make_unique(copied_value));
+// 	}
+
 
 		// comparing each node
 		for (auto this_it = nodes_.begin(), other_it = other.nodes_.begin();
