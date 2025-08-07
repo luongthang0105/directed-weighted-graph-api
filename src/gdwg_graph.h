@@ -11,13 +11,12 @@ namespace gdwg {
 	template<typename N, typename E>
 	class Edge {
 	 public:
-		Edge(N const& src, N const& dst)
-		: src_{src}
-		, dst_{dst} {}
+		Edge(N const& src, N const& dst);
+		Edge(Edge const& other);
 
 		virtual auto print_edge() -> std::string = 0;
 		virtual auto is_weighted() -> bool = 0;
-		virtual auto get_weight() -> std::optional<E> = 0;
+		virtual auto get_weight() const -> std::optional<E> = 0;
 		auto get_nodes() -> std::pair<N, N>;
 
 		virtual ~Edge() = default;
@@ -33,31 +32,33 @@ namespace gdwg {
 		friend class Graph;
 
 	 protected:
-		N* src_;
-		N* dst_;
+		N const* src_;
+		N const* dst_;
 	};
 
 	template<typename N, typename E>
 	class WeightedEdge : public Edge<N, E> {
 	 public:
 		WeightedEdge(N const& src, N const& dst, E const& weight);
+		WeightedEdge(WeightedEdge const& other);
 
 		auto print_edge() -> std::string override;
 		auto is_weighted() -> bool override;
-		auto get_weight() -> std::optional<E> override;
+		auto get_weight() const -> std::optional<E> override;
 
 	 private:
-		std::unique_ptr<E> weight;
+		std::unique_ptr<E> weight_;
 	};
 
 	template<typename N, typename E>
 	class UnweightedEdge : public Edge<N, E> {
 	 public:
 		UnweightedEdge(N const& src, N const& dst);
+		UnweightedEdge(UnweightedEdge const& other);
 
 		auto print_edge() -> std::string override;
 		auto is_weighted() -> bool override;
-		auto get_weight() -> std::optional<E> override;
+		auto get_weight() const -> std::optional<E> override;
 
 	 private:
 	};
