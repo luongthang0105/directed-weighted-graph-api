@@ -87,6 +87,9 @@ namespace gdwg {
 		// =================ACCESSORS===================
 		[[nodiscard]] auto empty() -> bool;
 
+		// =================COMPARISONS===================
+		[[nodiscard]] auto operator==(Graph const& other) -> bool;
+
 	 private:
 		struct UniquePtrValueComparator {
 			auto operator()(const std::unique_ptr<N>& a, const std::unique_ptr<N>& b) const -> bool;

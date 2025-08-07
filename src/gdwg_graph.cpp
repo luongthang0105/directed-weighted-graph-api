@@ -89,6 +89,44 @@ namespace gdwg {
 		nodes_.insert(std::make_unique<N>(value));
 		return true;
 	}
+	template<typename N, typename E>
+	[[nodiscard]] auto Graph<N, E>::operator==(Graph const& other) -> bool {
+		if (nodes_.size() != other.nodes_.size())
+			return false;
+		if (adjacency_list_.size() != other.adjacency_list_.size())
+			return false;
+
+		// comparing each node
+		for (auto this_it = nodes_.begin(), other_it = other.nodes_.begin();
+		     this_it != nodes_.end() && other_it != other.nodes_.end();
+		     this_it++, other_it++)
+		{
+			if (**this_it != **other_it) {
+				return false;
+			}
+		}
+
+		for (auto this_it = adjacency_list_.begin(), other_it = other.adjacency_list_.begin();
+		     this_it != adjacency_list_.end() && other_it != other.adjacency_list_.end();
+		     this_it++, other_it++)
+		{
+			auto& [this_node_ptr, this_edge_set] = *this_it;
+			auto& [other_node_ptr, other_edge_set] = *other_it;
+
+			if (*this_node_ptr != *other_node_ptr)
+				return false;
+
+			for (auto this_edge_it = this_edge_set.begin(), other_edge_it = other_edge_set.begin();
+			     this_edge_it != this_edge_set.end() && other_edge_it != other_edge_set.end();
+			     this_edge_it++, other_edge_it++)
+			{
+				if (**this_edge_it != **other_edge_it) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
 
 	template<typename N, typename E>
 	auto Edge<N, E>::UniquePtrEdgeComparator::operator()(const std::unique_ptr<Edge<N, E>>& a,
@@ -110,4 +148,13 @@ namespace gdwg {
 		return *edge_a.src_ < *edge_b.src_;
 	}
 
+	template<typename N, typename E>
+	[[nodiscard]] auto Edge<N, E>::operator==(Edge const& other) -> bool {
+		if (*src_ != *other.src_)
+			return false;
+		if (*dst_ != *other.dst_)
+			return false;
+		if (!get_weight().has_value() && !other.get_weight().has_value())
+			return true;
+	}
 } // namespace gdwg
