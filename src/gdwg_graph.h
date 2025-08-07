@@ -5,6 +5,7 @@
 #include <memory>
 #include <optional>
 #include <set>
+#include <sstream>
 #include <utility>
 
 namespace gdwg {
@@ -182,7 +183,7 @@ namespace gdwg {
 			return *this;
 		}
 
-		this.swap(Graph(other));
+		this->swap(Graph(other));
 		return *this;
 	}
 
@@ -205,18 +206,22 @@ namespace gdwg {
 	}
 
 	template<typename N, typename E>
-	auto Graph<N, E>::RawPtrValueComparator::operator()(const N*& a, const N*& b) const -> bool {
+	auto Graph<N, E>::RawPtrValueComparator::operator()(const N* a, const N* b) const -> bool {
 		return *a < *b;
 	}
 
 	// =================MODIFIERS===================
 	template<typename N, typename E>
 	auto Graph<N, E>::insert_node(N const& value) -> bool {
-		auto const copied_value = value;
-		auto new_unique_ptr = std::make_unique<N>(copied_value);
+		auto new_unique_ptr = std::make_unique<N>(value);
 		if (nodes_.contains(new_unique_ptr)) {
 			return false;
 		}
+		auto [it_new_elem, _] = nodes_.insert(std::move(new_unique_ptr));
+		adjacency_list_.insert(std::make_pair((*it_new_elem).get(), edge_set{}));
+		return true;
+	}
+
 	template<typename N, typename E>
 	auto Graph<N, E>::insert_edge(N const& src, N const& dst, std::optional<E> weight) -> bool {
 		if (!is_node(src) || !is_node(dst)) {
@@ -246,8 +251,7 @@ namespace gdwg {
 	// =================ACCESSORS===================
 	template<typename N, typename E>
 	[[nodiscard]] auto Graph<N, E>::is_node(N const& value) -> bool {
-		auto const copied_value = value;
-		return nodes_.contains(std::make_unique<N>(copied_value));
+		return nodes_.contains(std::make_unique<N>(value));
 	}
 
 	template<typename N, typename E>
@@ -273,6 +277,7 @@ namespace gdwg {
 			}
 		}
 
+		// comparing each edge
 		for (auto this_it = adjacency_list_.begin(), other_it = other.adjacency_list_.begin();
 		     this_it != adjacency_list_.end() && other_it != other.adjacency_list_.end();
 		     this_it++, other_it++)
