@@ -245,4 +245,37 @@ namespace gdwg {
 			}
 		}
 		return true;
+	}
+
+	template<typename N, typename E>
+	auto Edge<N, E>::UniquePtrEdgeComparator::operator()(const std::unique_ptr<Edge<N, E>>& a,
+	                                                     const std::unique_ptr<Edge<N, E>>& b) const -> bool {
+		auto const& edge_a = *a;
+		auto const& edge_b = *b;
+		if (*edge_a.src_ == *edge_b.src_) {
+			if (*edge_a.dst == *edge_b.dst) {
+				// it is actually UB where two edges of the same src and dst, within a graph, are both unweighted.
+				// However, if either is unweighted, then it is considered "smaller"
+				if (!edge_a.get_weight().has_value())
+					return true;
+				if (!edge_b.get_weight().has_value())
+					return false;
+
+				return edge_a.get_weight().value() < edge_b.get_weight().value();
+			}
+		}
+		return *edge_a.src_ < *edge_b.src_;
+	}
+
+	template<typename N, typename E>
+	[[nodiscard]] auto Edge<N, E>::operator==(Edge const& other) -> bool {
+		if (*src_ != *other.src_)
+			return false;
+		if (*dst_ != *other.dst_)
+			return false;
+		if (!get_weight().has_value() && !other.get_weight().has_value())
+			return true;
+	}
+} // namespace gdwg
+
 #endif // GDWG_GRAPH_H
