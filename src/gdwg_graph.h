@@ -5,6 +5,7 @@
 #include <memory>
 #include <optional>
 #include <set>
+#include <utility>
 
 namespace gdwg {
 	template<typename N, typename E>
