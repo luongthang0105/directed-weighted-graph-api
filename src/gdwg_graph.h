@@ -3,24 +3,55 @@
 
 #include <map>
 #include <memory>
+#include <optional>
 #include <set>
+
 namespace gdwg {
 	template<typename N, typename E>
 	class Edge {
 	 public:
+		Edge(N const& src, N const& dst)
+		: src_{src}
+		, dst_{dst} {}
+
+		virtual auto print_edge() -> std::string = 0;
+		virtual auto is_weighted() -> bool = 0;
+		virtual auto get_weight() -> std::optional<E> = 0;
+		auto get_nodes() -> std::pair<N, N>;
+
+		virtual ~Edge() = default;
+
 	 private:
-		// You may need to add data members and member functions
 		template<typename G_N, typename G_E>
 		friend class Graph;
+
+	 protected:
+		N* src_;
+		N* dst_;
 	};
 
-	class WeightedEdge {
+	template<typename N, typename E>
+	class WeightedEdge : public Edge<N, E> {
 	 public:
+		WeightedEdge(N const& src, N const& dst, E const& weight);
+
+		auto print_edge() -> std::string override;
+		auto is_weighted() -> bool override;
+		auto get_weight() -> std::optional<E> override;
+
 	 private:
+		std::unique_ptr<E> weight;
 	};
 
-	class UnweightedEdge {
+	template<typename N, typename E>
+	class UnweightedEdge : public Edge<N, E> {
 	 public:
+		UnweightedEdge(N const& src, N const& dst);
+
+		auto print_edge() -> std::string override;
+		auto is_weighted() -> bool override;
+		auto get_weight() -> std::optional<E> override;
+
 	 private:
 	};
 
