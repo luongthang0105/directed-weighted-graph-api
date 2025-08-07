@@ -208,6 +208,11 @@ namespace gdwg {
 		return nodes_.contains(std::make_unique<N>(copied_value));
 	}
 
+	template<typename N, typename E>
+	[[nodiscard]] auto Graph<N, E>::empty() -> bool {
+		return nodes_.size() == 0 && adjacency_list_.size() == 0;
+	}
+
 	// =================COMPARISONS===================
 	template<typename N, typename E>
 	[[nodiscard]] auto Graph<N, E>::operator==(Graph const& other) -> bool {
