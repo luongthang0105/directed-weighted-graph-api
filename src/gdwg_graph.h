@@ -104,6 +104,12 @@ namespace gdwg {
 		};
 
 		auto swap(Graph& other) noexcept -> void;
+
+		/**
+		 * Precondition: `is_node(value) == true`
+		 */
+		auto find_node_by_value(N const& value) -> const std::unique_ptr<N>&;
+
 		using edge_set = std::set<std::unique_ptr<Edge<N, E>>, typename Edge<N, E>::UniquePtrEdgeComparator>;
 
 		std::set<std::unique_ptr<N>, UniquePtrValueComparator> nodes_;
@@ -151,16 +157,22 @@ namespace gdwg {
 
 	template<typename N, typename E>
 	Graph<N, E>::Graph(Graph const& other) {
+		for (const std::unique_ptr<N>& node : other.nodes_) {
+			auto val = *node;
+			insert_node(val);
+		}
+
 		for (auto& [node_ptr, edges] : other.adjacency_list_) {
-			auto clone_edge_set = std::set<std::unique_ptr<Edge<N, E>>>{};
-			auto clone_node = std::make_unique<N>(*node_ptr);
+			for (const std::unique_ptr<Edge<N, E>>& edge : edges) {
+				auto [src, dst] = (*edge).get_nodes();
 
-			for (auto& edge : edges) {
-				clone_edge_set.insert(*edge);
+				// SAFETY COMMENT: find_node_by_value() should always has value, because we already inserted all nodes
+				// into the graph, in the above for loop.
+				auto& src_ptr = find_node_by_value(src);
+				auto& dst_ptr = find_node_by_value(dst);
+				auto weight = (*edge).get_weight();
+				insert_edge(*src_ptr, *dst_ptr, weight);
 			}
-
-			adjacency_list_.insert(std::make_pair(clone_node.get(), clone_edge_set));
-			nodes_.insert(std::move(clone_node));
 		}
 	}
 
@@ -178,6 +190,12 @@ namespace gdwg {
 	auto Graph<N, E>::swap(Graph& other) noexcept -> void {
 		std::swap(nodes_, other.nodes_);
 		std::swap(adjacency_list_, other.adjacency_list_);
+	}
+
+	template<typename N, typename E>
+	auto Graph<N, E>::find_node_by_value(N const& value) -> const std::unique_ptr<N>& {
+		auto it = nodes_.find(std::make_unique<N>(value));
+		return *it;
 	}
 
 	template<typename N, typename E>
