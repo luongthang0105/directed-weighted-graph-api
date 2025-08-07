@@ -82,14 +82,18 @@ namespace gdwg {
 		[[nodiscard]] auto empty() -> bool;
 
 	 private:
-		struct ValueComparator {
-			auto operator()(std::unique_ptr<N> a, std::unique_ptr<N> b) const -> bool;
+		struct UniquePtrValueComparator {
+			auto operator()(const std::unique_ptr<N>& a, const std::unique_ptr<N>& b) const -> bool;
+		};
+
+		struct RawPtrValueComparator {
+			auto operator()(N* a, N* b) const -> bool;
 		};
 
 		auto swap(Graph& other) noexcept -> void;
 
-		std::set<std::unique_ptr<N>, ValueComparator> nodes_;
-		std::map<N*, std::set<std::unique_ptr<Edge<N, E>>>> adjacency_list_;
+		std::set<std::unique_ptr<N>, UniquePtrValueComparator> nodes_;
+		std::map<N*, std::set<std::unique_ptr<Edge<N, E>>>, RawPtrValueComparator> adjacency_list_;
 	};
 } // namespace gdwg
 

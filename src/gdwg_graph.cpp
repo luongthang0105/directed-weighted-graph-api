@@ -71,7 +71,13 @@ namespace gdwg {
 	}
 
 	template<typename N, typename E>
-	auto Graph<N, E>::ValueComparator::operator()(std::unique_ptr<N> a, std::unique_ptr<N> b) const -> bool {
+	auto Graph<N, E>::UniquePtrValueComparator::operator()(const std::unique_ptr<N>& a, const std::unique_ptr<N>& b) const
+	    -> bool {
+		return *a < *b;
+	}
+
+	template<typename N, typename E>
+	auto Graph<N, E>::RawPtrValueComparator::operator()(N* a, N* b) const -> bool {
 		return *a < *b;
 	}
 
