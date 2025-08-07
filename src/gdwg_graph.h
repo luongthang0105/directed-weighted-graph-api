@@ -45,6 +45,9 @@ namespace gdwg {
 		// =================MODIFIERS===================
 		auto insert_node(N const& value) -> bool;
 
+		// =================ACCESSORS===================
+		[[nodiscard]] auto empty() -> bool;
+
 	 private:
 		struct ValueComparator {
 			auto operator()(std::unique_ptr<N> a, std::unique_ptr<N> b) const -> bool;
