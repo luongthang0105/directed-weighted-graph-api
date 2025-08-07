@@ -85,6 +85,7 @@ namespace gdwg {
 
 		// =================MODIFIERS===================
 		auto insert_node(N const& value) -> bool;
+		auto insert_edge(N const& src, N const& dst, std::optional<E> weight = std::nullopt) -> bool;
 
 		// =================ACCESSORS===================
 		[[nodiscard]] auto is_node(N const& value) -> bool;
@@ -198,7 +199,29 @@ namespace gdwg {
 		if (nodes_.contains(new_unique_ptr)) {
 			return false;
 		}
-		nodes_.insert(std::move(new_unique_ptr));
+	template<typename N, typename E>
+	auto Graph<N, E>::insert_edge(N const& src, N const& dst, std::optional<E> weight) -> bool {
+		if (!is_node(src) || !is_node(dst)) {
+			throw std::runtime_error("Cannot call gdwg::Graph<N, E>::insert_edge when either src or dst node does not "
+			                         "exist");
+		}
+
+		auto& src_ptr = find_node_by_value(src);
+		auto& dst_ptr = find_node_by_value(dst);
+
+		std::unique_ptr<Edge<N, E>> new_edge;
+		if (weight.has_value()) {
+			new_edge = std::make_unique<WeightedEdge<N, E>>(*src_ptr, *dst_ptr, weight.value());
+		}
+		else {
+			new_edge = std::make_unique<UnweightedEdge<N, E>>(*src_ptr, *dst_ptr);
+		}
+
+		auto& edges_from_src = adjacency_list_.at(src_ptr.get());
+		if (edges_from_src.contains(new_edge)) {
+			return false;
+		}
+		edges_from_src.insert(std::move(new_edge));
 		return true;
 	}
 
