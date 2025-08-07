@@ -282,6 +282,37 @@ namespace gdwg {
 		if (!get_weight().has_value() && !other.get_weight().has_value())
 			return true;
 	}
+
+	template<typename N, typename E>
+	auto WeightedEdge<N, E>::get_weight() const -> std::optional<E> {
+		return *weight_;
+	}
+
+	template<typename N, typename E>
+	UnweightedEdge<N, E>::UnweightedEdge(N const& src, N const& dst)
+	: Edge<N, E>(src, dst) {}
+
+	template<typename N, typename E>
+	UnweightedEdge<N, E>::UnweightedEdge(UnweightedEdge const& other)
+	: Edge<N, E>(other) {}
+
+	template<typename N, typename E>
+	auto UnweightedEdge<N, E>::print_edge() -> std::string {
+		auto ss = std::stringstream{};
+		ss << *(this->src_) << " -> ";
+		ss << *(this->dst_) << " | U";
+		return ss.str();
+	}
+
+	template<typename N, typename E>
+	auto UnweightedEdge<N, E>::is_weighted() -> bool {
+		return false;
+	}
+
+	template<typename N, typename E>
+	auto UnweightedEdge<N, E>::get_weight() const -> std::optional<E> {
+		return std::nullopt;
+	}
 } // namespace gdwg
 
 #endif // GDWG_GRAPH_H
