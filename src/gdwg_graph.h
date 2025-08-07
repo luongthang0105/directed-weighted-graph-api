@@ -146,4 +146,54 @@ namespace gdwg {
 		return *this;
 	}
 
+	template<typename N, typename E>
+	Graph<N, E>::Graph(Graph const& other) {
+		for (auto& [node_ptr, edges] : other.adjacency_list_) {
+			auto clone_edge_set = std::set<std::unique_ptr<Edge<N, E>>>{};
+			auto clone_node = std::make_unique<N>(*node_ptr);
+
+			for (auto& edge : edges) {
+				clone_edge_set.insert(*edge);
+			}
+
+			adjacency_list_.insert(std::make_pair(clone_node.get(), clone_edge_set));
+			nodes_.insert(std::move(clone_node));
+		}
+	}
+
+	template<typename N, typename E>
+	auto Graph<N, E>::operator=(Graph const& other) -> Graph& {
+		if (this == &other) {
+			return *this;
+		}
+
+		this.swap(Graph(other));
+		return *this;
+	}
+
+	template<typename N, typename E>
+	auto Graph<N, E>::swap(Graph& other) noexcept -> void {
+		std::swap(nodes_, other.nodes_);
+		std::swap(adjacency_list_, other.adjacency_list_);
+	}
+
+	template<typename N, typename E>
+	auto Graph<N, E>::UniquePtrValueComparator::operator()(const std::unique_ptr<N>& a, const std::unique_ptr<N>& b) const
+	    -> bool {
+		return *a < *b;
+	}
+
+	template<typename N, typename E>
+	auto Graph<N, E>::RawPtrValueComparator::operator()(const N*& a, const N*& b) const -> bool {
+		return *a < *b;
+	}
+
+	// =================MODIFIERS===================
+	template<typename N, typename E>
+	auto Graph<N, E>::insert_node(N const& value) -> bool {
+		auto const copied_value = value;
+		auto new_unique_ptr = std::make_unique<N>(copied_value);
+		if (nodes_.contains(new_unique_ptr)) {
+			return false;
+		}
 #endif // GDWG_GRAPH_H
