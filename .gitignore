@@ -7,3 +7,4 @@ Testing/
 .DS_Store
 CMakeFiles
 Notes.md
+.vscode/
