@@ -89,6 +89,7 @@ namespace gdwg {
 		nodes_.insert(std::make_unique<N>(value));
 		return true;
 	}
+
 	template<typename N, typename E>
 	[[nodiscard]] auto Graph<N, E>::operator==(Graph const& other) -> bool {
 		if (nodes_.size() != other.nodes_.size())
