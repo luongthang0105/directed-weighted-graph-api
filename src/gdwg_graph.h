@@ -8,6 +8,7 @@
 #include <set>
 #include <sstream>
 #include <utility>
+#include <vector>
 
 namespace gdwg {
 	template<typename N, typename E>
@@ -93,6 +94,7 @@ namespace gdwg {
 		[[nodiscard]] auto is_node(N const& value) -> bool;
 		[[nodiscard]] auto empty() -> bool;
 		[[nodiscard]] auto is_connected(N const& src, N const& dst) -> bool;
+		[[nodiscard]] auto nodes() -> std::vector<N>;
 
 		// =================COMPARISONS===================
 		[[nodiscard]] auto operator==(Graph const& other) const -> bool;
@@ -278,6 +280,16 @@ namespace gdwg {
 			                    return dst == edge_dst;
 		                    })
 		       != edges_from_src.end();
+	}
+
+	template<typename N, typename E>
+	auto Graph<N, E>::nodes() -> std::vector<N> {
+		auto returned_nodes = std::vector<N>{};
+
+		for (auto& node : nodes_) {
+			returned_nodes.push_back(*node);
+		}
+		return returned_nodes;
 	}
 
 	// =================COMPARISONS===================
