@@ -18,9 +18,9 @@ namespace gdwg {
 		Edge(N const& src, N const& dst);
 		Edge(Edge const& other);
 
-		virtual auto print_edge() -> std::string = 0;
-		virtual auto is_weighted() -> bool = 0;
-		virtual auto get_weight() const -> std::optional<E> = 0;
+		virtual auto print_edge() const noexcept -> std::string = 0;
+		virtual auto is_weighted() const noexcept -> bool = 0;
+		virtual auto get_weight() const noexcept -> std::optional<E> = 0;
 		auto get_nodes() const -> std::pair<N, N>;
 
 		virtual ~Edge() = default;
@@ -46,9 +46,9 @@ namespace gdwg {
 		WeightedEdge(N const& src, N const& dst, E const& weight);
 		explicit WeightedEdge(WeightedEdge const& other);
 
-		auto print_edge() -> std::string override;
-		auto is_weighted() -> bool override;
-		auto get_weight() const -> std::optional<E> override;
+		auto print_edge() const noexcept -> std::string override;
+		auto is_weighted() const noexcept -> bool override;
+		auto get_weight() const noexcept -> std::optional<E> override;
 
 	 private:
 		std::unique_ptr<E> weight_;
@@ -60,9 +60,9 @@ namespace gdwg {
 		UnweightedEdge(N const& src, N const& dst);
 		explicit UnweightedEdge(UnweightedEdge const& other);
 
-		auto print_edge() -> std::string override;
-		auto is_weighted() -> bool override;
-		auto get_weight() const -> std::optional<E> override;
+		auto print_edge() const noexcept -> std::string override;
+		auto is_weighted() const noexcept -> bool override;
+		auto get_weight() const noexcept -> std::optional<E> override;
 
 	 private:
 	};
@@ -571,7 +571,7 @@ namespace gdwg {
 	, weight_{std::make_unique<E>(*other.weight_)} {}
 
 	template<typename N, typename E>
-	auto WeightedEdge<N, E>::print_edge() -> std::string {
+	auto WeightedEdge<N, E>::print_edge() const noexcept -> std::string {
 		auto ss = std::stringstream{};
 		ss << *(this->src_) << " -> ";
 		ss << *(this->dst_) << " | W | ";
@@ -580,12 +580,12 @@ namespace gdwg {
 	}
 
 	template<typename N, typename E>
-	auto WeightedEdge<N, E>::is_weighted() -> bool {
+	auto WeightedEdge<N, E>::is_weighted() const noexcept -> bool {
 		return true;
 	}
 
 	template<typename N, typename E>
-	auto WeightedEdge<N, E>::get_weight() const -> std::optional<E> {
+	auto WeightedEdge<N, E>::get_weight() const noexcept -> std::optional<E> {
 		return *weight_;
 	}
 
@@ -598,7 +598,7 @@ namespace gdwg {
 	: Edge<N, E>(other) {}
 
 	template<typename N, typename E>
-	auto UnweightedEdge<N, E>::print_edge() -> std::string {
+	auto UnweightedEdge<N, E>::print_edge() const noexcept -> std::string {
 		auto ss = std::stringstream{};
 		ss << *(this->src_) << " -> ";
 		ss << *(this->dst_) << " | U";
@@ -606,12 +606,12 @@ namespace gdwg {
 	}
 
 	template<typename N, typename E>
-	auto UnweightedEdge<N, E>::is_weighted() -> bool {
+	auto UnweightedEdge<N, E>::is_weighted() const noexcept -> bool {
 		return false;
 	}
 
 	template<typename N, typename E>
-	auto UnweightedEdge<N, E>::get_weight() const -> std::optional<E> {
+	auto UnweightedEdge<N, E>::get_weight() const noexcept -> std::optional<E> {
 		return std::nullopt;
 	}
 } // namespace gdwg
