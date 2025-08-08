@@ -627,6 +627,54 @@ namespace gdwg {
 	}
 
 	template<typename N, typename E>
+	auto Graph<N, E>::iterator::operator++() -> iterator& {
+		if (!edge_iter_cur_.has_value()) // reached last edge
+			return *this;
+		//                                              for case when .begin() is at .end()
+		if (edge_iter_cur_ == get_edge_iter_end() || ++(edge_iter_cur_.value()) == get_edge_iter_end()) {
+			adj_list_iter_cur_++;
+			// skip adj list with zero edges
+			while (adj_list_iter_cur_ != adj_list_iter_end_ && adj_list_iter_cur_->second.size() == 0) {
+				adj_list_iter_cur_++;
+			}
+
+			if (adj_list_iter_cur_ == adj_list_iter_end_) {
+				edge_iter_cur_ = std::nullopt;
+			}
+			else {
+				edge_iter_cur_ = adj_list_iter_cur_->second.begin();
+			}
+		}
+		return *this;
+	}
+
+	template<typename N, typename E>
+	auto Graph<N, E>::iterator::operator++(int) -> iterator {
+		auto temp = *this;
+		++*this;
+		return temp;
+	}
+
+	template<typename N, typename E>
+	auto Graph<N, E>::iterator::operator--() -> iterator& {
+		if (edge_iter_cur_ == get_edge_iter_begin()) {
+			if (adj_list_iter_cur_ == adj_list_iter_begin_) {
+				return *this;
+			}
+			else {
+				--adj_list_iter_cur_;
+				while (adj_list_iter_cur_ != adj_list_iter_begin_ && adj_list_iter_cur_->second.size() == 0) {
+					--adj_list_iter_cur_;
+				}
+				edge_iter_cur_ = (adj_list_iter_cur_->second.end());
+			}
+		}
+		(edge_iter_cur_.value())--;
+
+		return *this;
+	}
+
+	template<typename N, typename E>
 	Edge<N, E>::Edge(N const& src, N const& dst)
 	: src_{&src}
 	, dst_{&dst} {}
