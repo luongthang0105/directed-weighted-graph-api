@@ -25,7 +25,7 @@ namespace gdwg {
 
 		virtual ~Edge() = default;
 
-		[[nodiscard]] auto operator==(Edge const& other) -> bool;
+		[[nodiscard]] auto operator==(Edge const& other) const noexcept -> bool;
 
 		struct UniquePtrEdgeComparator {
 			auto operator()(const std::unique_ptr<Edge<N, E>>& a, const std::unique_ptr<Edge<N, E>>& b) const -> bool;
@@ -97,11 +97,11 @@ namespace gdwg {
 		auto clear() noexcept -> void;
 
 		// =================ACCESSORS===================
-		[[nodiscard]] auto is_node(N const& value) -> bool;
-		[[nodiscard]] auto empty() -> bool;
-		[[nodiscard]] auto is_connected(N const& src, N const& dst) -> bool;
-		[[nodiscard]] auto nodes() -> std::vector<N>;
-		[[nodiscard]] auto edges(N const& src, N const& dst) -> std::vector<std::unique_ptr<Edge<N, E>>>;
+		[[nodiscard]] auto is_node(N const& value) const -> bool;
+		[[nodiscard]] auto empty() const noexcept -> bool;
+		[[nodiscard]] auto is_connected(N const& src, N const& dst) const -> bool;
+		[[nodiscard]] auto nodes() const -> std::vector<N>;
+		[[nodiscard]] auto edges(N const& src, N const& dst) const -> std::vector<std::unique_ptr<Edge<N, E>>>;
 		// [[nodiscard]] auto find(N const& src, N const& dst, std::optional<E> weight = std::nullopt) -> iterator;
 		[[nodiscard]] auto connections(N const& src) -> std::vector<N>;
 
@@ -362,17 +362,17 @@ namespace gdwg {
 
 	// =================ACCESSORS===================
 	template<typename N, typename E>
-	[[nodiscard]] auto Graph<N, E>::is_node(N const& value) -> bool {
+	[[nodiscard]] auto Graph<N, E>::is_node(N const& value) const -> bool {
 		return nodes_.contains(std::make_unique<N>(value)); // O(log(n)) because nodes_ is a set.
 	}
 
 	template<typename N, typename E>
-	[[nodiscard]] auto Graph<N, E>::empty() -> bool {
+	[[nodiscard]] auto Graph<N, E>::empty() const noexcept -> bool {
 		return nodes_.size() == 0 && adjacency_list_.size() == 0;
 	}
 
 	template<typename N, typename E>
-	auto Graph<N, E>::is_connected(N const& src, N const& dst) -> bool {
+	auto Graph<N, E>::is_connected(N const& src, N const& dst) const -> bool {
 		if (!is_node(src) || !is_node(dst)) {
 			throw std::runtime_error("Cannot call gdwg::Graph<N, E>::is_connected if src or dst node don't exist in "
 			                         "the graph");
@@ -391,7 +391,7 @@ namespace gdwg {
 	}
 
 	template<typename N, typename E>
-	auto Graph<N, E>::nodes() -> std::vector<N> {
+	auto Graph<N, E>::nodes() const -> std::vector<N> {
 		auto returned_nodes = std::vector<N>{};
 
 		for (auto& node : nodes_) {
@@ -401,7 +401,7 @@ namespace gdwg {
 	}
 
 	template<typename N, typename E>
-	auto Graph<N, E>::edges(N const& src, N const& dst) -> std::vector<std::unique_ptr<Edge<N, E>>> {
+	auto Graph<N, E>::edges(N const& src, N const& dst) const -> std::vector<std::unique_ptr<Edge<N, E>>> {
 		if (!is_node(src) || !is_node(dst)) {
 			throw std::runtime_error("Cannot call gdwg::Graph<N, E>::edges if src or dst node don't exist in the "
 			                         "graph");
@@ -551,7 +551,7 @@ namespace gdwg {
 	}
 
 	template<typename N, typename E>
-	[[nodiscard]] auto Edge<N, E>::operator==(Edge const& other) -> bool {
+	[[nodiscard]] auto Edge<N, E>::operator==(Edge const& other) const noexcept -> bool {
 		if (*src_ != *other.src_)
 			return false;
 		if (*dst_ != *other.dst_)
