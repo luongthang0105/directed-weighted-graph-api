@@ -123,6 +123,39 @@ TEST_CASE("Modifiers") {
 		CHECK(connections_from_1.size() == 1);
 		CHECK(connections_from_1[0] == 1);
 	}
+
+	SECTION("erase_edge") {
+		auto g = gdwg::Graph<int, std::string>{1, 2, 3, 4};
+		//     v-----------|
+		//  |--1 --> 2 --> 3
+		//  |--^     |---> 4
+		//           |-----^
+		REQUIRE(g.insert_edge(1, 2, "hello"));
+		REQUIRE(g.insert_edge(2, 3, "hi"));
+		REQUIRE(g.insert_edge(2, 4, "h"));
+		REQUIRE(g.insert_edge(2, 4, std::nullopt));
+		REQUIRE(g.insert_edge(3, 1, std::nullopt));
+		REQUIRE(g.insert_edge(1, 1, std::nullopt));
+
+		CHECK_FALSE(g.erase_edge(1, 3));
+		CHECK_FALSE(g.erase_edge(2, 1));
+
+		CHECK(g.is_connected(2, 4));
+		CHECK(g.erase_edge(2, 4));
+
+		CHECK(g.is_connected(2, 4));
+		CHECK_FALSE(g.erase_edge(2, 4)); // can't erase old edge
+		CHECK(g.erase_edge(2, 4, "h")); // erase the last edge from 2->4
+		CHECK_FALSE(g.is_connected(2, 4));
+
+		CHECK(g.is_connected(3, 1));
+		CHECK(g.erase_edge(3, 1));
+		CHECK_FALSE(g.is_connected(3, 1));
+
+		CHECK(g.is_connected(1, 1));
+		CHECK(g.erase_edge(1, 1));
+		CHECK_FALSE(g.is_connected(1, 1));
+	}
 }
 
 TEST_CASE("Accessors") {

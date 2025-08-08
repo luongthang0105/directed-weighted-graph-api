@@ -91,6 +91,7 @@ namespace gdwg {
 		auto insert_node(N const& value) -> bool;
 		auto insert_edge(N const& src, N const& dst, std::optional<E> weight = std::nullopt) -> bool;
 		auto erase_node(N const& value) -> bool;
+		auto erase_edge(N const& src, N const& dst, std::optional<E> weight = std::nullopt) -> bool;
 
 		// =================ACCESSORS===================
 		[[nodiscard]] auto is_node(N const& value) -> bool;
@@ -276,6 +277,22 @@ namespace gdwg {
 		// erase from nodes_
 		std::erase_if(nodes_, [&value](std::unique_ptr<N> const& node) { return *node == value; });
 		return true;
+	}
+
+	template<typename N, typename E>
+	auto Graph<N, E>::erase_edge(N const& src, N const& dst, std::optional<E> weight) -> bool {
+		if (!is_node(src) || !is_node(dst)) {
+			throw std::runtime_error("Cannot call gdwg::Graph<N, E>::erase_edge on src or dst if they don't exist in "
+			                         "the graph");
+		}
+
+		auto& src_ptr = find_node_by_value(src);
+		auto& edges_from_src = adjacency_list_.at(src_ptr.get());
+		return std::erase_if(edges_from_src,
+		                     [&](std::unique_ptr<Edge<N, E>> const& edge) {
+			                     return (*edge).get_nodes() == std::make_pair(src, dst) && (*edge).get_weight() == weight;
+		                     })
+		       != 0;
 	}
 
 	// =================ACCESSORS===================
