@@ -176,6 +176,40 @@ TEST_CASE("Modifiers") {
 			CHECK(g.is_connected(3, 2));
 			CHECK(g.is_connected(2, 3));
 		}
+		SECTION("Test 2") {
+			auto g = gdwg::Graph<int, int>{1, 2, 3, 4};
+			REQUIRE(g.insert_edge(1, 2, 1));
+			REQUIRE(g.insert_edge(1, 3, 2));
+			REQUIRE(g.insert_edge(1, 4, 3));
+
+			// merge node 1 to 3
+			CHECK_NOTHROW(g.merge_replace_node(1, 2));
+
+			CHECK(g.is_connected(2, 2));
+			CHECK(g.is_connected(2, 3));
+			CHECK(g.is_connected(2, 4));
+		}
+
+		SECTION("Test 3") {
+			auto g = gdwg::Graph<int, int>{1, 2, 3, 4};
+			REQUIRE(g.insert_edge(1, 2, 1));
+			REQUIRE(g.insert_edge(1, 2, 2));
+			REQUIRE(g.insert_edge(1, 3, 2));
+			REQUIRE(g.insert_edge(1, 4, 3));
+			REQUIRE(g.insert_edge(2, 2, 1));
+			REQUIRE(g.insert_edge(2, 2, std::nullopt));
+
+			// merge node 1 to 3
+			CHECK_NOTHROW(g.merge_replace_node(1, 2));
+
+			CHECK(g.is_connected(2, 2));
+			CHECK(g.is_connected(2, 3));
+			CHECK(g.is_connected(2, 4));
+
+			auto from2to2 = g.edges(2, 2);
+			CHECK(from2to2.size() == 3);
+		}
+	}
 
 	SECTION("erase_node") {
 		auto g = gdwg::Graph<int, std::string>{1, 2, 3, 4};
