@@ -96,5 +96,36 @@ TEST_CASE("Modifiers") {
 }
 
 TEST_CASE("Accessors") {
-	SECTION("is_node") {}
+	SECTION("is_connected") {
+		auto g = gdwg::Graph<int, std::string>{{1, 2, 3, 4}};
+		// v-----------|
+		// 1 --> 2 --> 3
+		//       |---> 4
+		REQUIRE(g.insert_edge(1, 2, "hello"));
+		REQUIRE(g.insert_edge(2, 3, "hi"));
+		REQUIRE(g.insert_edge(2, 4, "h"));
+		REQUIRE(g.insert_edge(2, 4, std::nullopt));
+		REQUIRE(g.insert_edge(3, 1, std::nullopt));
+
+		auto const error_msg = "Cannot call gdwg::Graph<N, E>::is_connected if src or dst node don't exist in "
+		                       "the graph";
+		SECTION("Success: valid queries") {
+			CHECK(g.is_connected(1, 2));
+			CHECK(g.is_connected(2, 3));
+			CHECK(g.is_connected(2, 4));
+			CHECK(g.is_connected(3, 1));
+
+			CHECK(!g.is_connected(1, 4));
+			CHECK(!g.is_connected(4, 1));
+			CHECK(!g.is_connected(2, 1));
+			CHECK(!g.is_connected(3, 2));
+			CHECK(!g.is_connected(3, 4));
+		}
+		SECTION("Error: src or dst does not exist") {
+			CHECK_THROWS_AS(g.is_connected(0, 2), std::runtime_error);
+			CHECK_THROWS_WITH(g.is_connected(0, 2), error_msg);
+			CHECK_THROWS_WITH(g.is_connected(1, 5), error_msg);
+			CHECK_THROWS_WITH(g.is_connected(-1, 6), error_msg);
+		}
+	}
 }

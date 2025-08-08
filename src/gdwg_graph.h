@@ -19,7 +19,7 @@ namespace gdwg {
 		virtual auto print_edge() -> std::string = 0;
 		virtual auto is_weighted() -> bool = 0;
 		virtual auto get_weight() const -> std::optional<E> = 0;
-		auto get_nodes() -> std::pair<N, N>;
+		auto get_nodes() const -> std::pair<N, N>;
 
 		virtual ~Edge() = default;
 
@@ -273,10 +273,9 @@ namespace gdwg {
 
 		return std::find_if(edges_from_src.begin(),
 		                    edges_from_src.end(),
-		                    [&dst](Edge<N, E> const& edge) {
-			                    N edge_dst = edge.get_nodes().second;
-			                    if (dst == edge_dst)
-				                    return true;
+		                    [&dst](auto const& edge) {
+			                    N edge_dst = (*edge).get_nodes().second;
+			                    return dst == edge_dst;
 		                    })
 		       != edges_from_src.end();
 	}
@@ -354,7 +353,7 @@ namespace gdwg {
 	, dst_{other.dst_} {}
 
 	template<typename N, typename E>
-	auto Edge<N, E>::get_nodes() -> std::pair<N, N> {
+	auto Edge<N, E>::get_nodes() const -> std::pair<N, N> {
 		return std::make_pair(*src_, *dst_);
 	}
 
