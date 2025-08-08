@@ -2,6 +2,7 @@
 #define GDWG_GRAPH_H
 
 #include <algorithm>
+#include <iostream>
 #include <map>
 #include <memory>
 #include <optional>
@@ -96,6 +97,8 @@ namespace gdwg {
 		[[nodiscard]] auto is_connected(N const& src, N const& dst) -> bool;
 		[[nodiscard]] auto nodes() -> std::vector<N>;
 		[[nodiscard]] auto edges(N const& src, N const& dst) -> std::vector<std::unique_ptr<Edge<N, E>>>;
+		// [[nodiscard]] auto find(N const& src, N const& dst, std::optional<E> weight = std::nullopt) -> iterator;
+		[[nodiscard]] auto connections(N const& src) -> std::vector<N>;
 
 		// =================COMPARISONS===================
 		[[nodiscard]] auto operator==(Graph const& other) const -> bool;
@@ -328,6 +331,25 @@ namespace gdwg {
 			}
 		}
 		return returned_edges;
+	}
+
+	template<typename N, typename E>
+	auto Graph<N, E>::connections(N const& src) -> std::vector<N> {
+		if (!is_node(src)) {
+			throw std::runtime_error("Cannot call gdwg::Graph<N, E>::connections if src doesn't exist in the "
+			                         "graph");
+		}
+		auto& src_ptr = find_node_by_value(src); // O(log(n))
+		auto& edges_from_src = adjacency_list_.at(src_ptr.get()); // O(log(n))
+
+		auto returned_nodes = std::vector<N>{};
+		for (auto& edge_ptr : edges_from_src) { // O(e)
+			auto const dst = edge_ptr->get_nodes().second;
+			if (returned_nodes.empty() || returned_nodes.back() != dst) {
+				returned_nodes.push_back(dst);
+			}
+		}
+		return returned_nodes;
 	}
 
 	// =================COMPARISONS===================
