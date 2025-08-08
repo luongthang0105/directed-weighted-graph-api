@@ -90,6 +90,7 @@ namespace gdwg {
 		// =================MODIFIERS===================
 		auto insert_node(N const& value) -> bool;
 		auto insert_edge(N const& src, N const& dst, std::optional<E> weight = std::nullopt) -> bool;
+		auto erase_node(N const& value) -> bool;
 
 		// =================ACCESSORS===================
 		[[nodiscard]] auto is_node(N const& value) -> bool;
@@ -253,6 +254,27 @@ namespace gdwg {
 			return false;
 		}
 		edges_from_src.insert(std::move(new_edge));
+		return true;
+	}
+
+	template<typename N, typename E>
+	auto Graph<N, E>::erase_node(N const& value) -> bool {
+		if (!is_node(value))
+			return false;
+
+		auto& orig_ptr = find_node_by_value(value);
+
+		// erase from adj list
+		adjacency_list_.erase(orig_ptr.get());
+		for (auto& [node_ptr, edge_set] : adjacency_list_) {
+			std::erase_if(edge_set, [&value](std::unique_ptr<Edge<N, E>> const& edge) {
+				auto [src, dst] = (*edge).get_nodes();
+				return src == value || dst == value;
+			});
+		}
+
+		// erase from nodes_
+		std::erase_if(nodes_, [&value](std::unique_ptr<N> const& node) { return *node == value; });
 		return true;
 	}
 
