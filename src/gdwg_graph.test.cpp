@@ -495,3 +495,51 @@ TEST_CASE("Iterator") {
 		CHECK((*it).from == 1);
 		CHECK((*it).to == 2);
 	}
+	SECTION("Traverse") {
+		auto g = graph{1, 2, 3, 4, 5, 6};
+		g.insert_edge(1, 5, -1);
+		g.insert_edge(2, 1, 1);
+		g.insert_edge(2, 4, std::nullopt);
+		g.insert_edge(2, 4, 2);
+		g.insert_edge(3, 2, 2);
+		g.insert_edge(3, 6, -8);
+		g.insert_edge(4, 1, std::nullopt);
+		g.insert_edge(4, 1, -4);
+		g.insert_edge(4, 5, 3);
+		g.insert_edge(5, 2, std::nullopt);
+		g.insert_edge(6, 2, 5);
+		g.insert_edge(6, 3, 10);
+
+		g.insert_node(64);
+
+		SECTION("operator++") {
+			auto it = g.begin();
+			CHECK((*it).from == 1);
+			CHECK((*it).to == 5);
+			CHECK((*it).weight == -1);
+
+			it++;
+
+			CHECK((*it).from == 2);
+			CHECK((*it).to == 1);
+			CHECK((*it).weight == 1);
+
+			it++;
+
+			CHECK((*it).from == 2);
+			CHECK((*it).to == 4);
+			CHECK((*it).weight == std::nullopt);
+
+			it++;
+
+			CHECK((*it).from == 2);
+			CHECK((*it).to == 4);
+			CHECK((*it).weight == 2);
+
+			it++;
+
+			CHECK((*it).from == 3);
+			CHECK((*it).to == 2);
+			CHECK((*it).weight == 2);
+
+			it++;
