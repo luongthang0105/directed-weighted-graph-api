@@ -49,6 +49,41 @@ TEST_CASE("Constructors") {
 		CHECK(!g2.is_node(6));
 		// TODO: check iterator created before move is NOT invalidated.
 	}
+
+	SECTION("Copy Constructor") {
+		auto g = gdwg::Graph<int, std::string>{{1, 2, 3}};
+		auto g2 = g;
+
+		CHECK(g2.is_node(1));
+		CHECK(g2.is_node(2));
+		CHECK(g2.is_node(3));
+
+		// this is just to check we don't accidentally invalidates g
+		CHECK(g.is_node(1));
+		CHECK(g.is_node(2));
+		CHECK(g.is_node(3));
+
+		CHECK(g == g2);
+
+		// TODO: check iterator created before move is NOT invalidated.
+	}
+
+	SECTION("Copy Constructor") {
+		auto g = gdwg::Graph<int, std::string>{{1, 2, 3}};
+		auto g2 = gdwg::Graph<int, std::string>{g};
+
+		CHECK(g2.is_node(1));
+		CHECK(g2.is_node(2));
+		CHECK(g2.is_node(3));
+
+		// this is just to check we don't accidentally invalidates g
+		CHECK(g.is_node(1));
+		CHECK(g.is_node(2));
+		CHECK(g.is_node(3));
+
+		CHECK(g == g2);
+		// TODO: check iterator created before move is NOT invalidated.
+	}
 }
 
 TEST_CASE("Modifiers") {
