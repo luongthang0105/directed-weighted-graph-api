@@ -188,4 +188,33 @@ TEST_CASE("Accessors") {
 		CHECK_THROWS_WITH(g.edges(1, 4),
 		                  "Cannot call gdwg::Graph<N, E>::edges if src or dst node don't exist in the graph");
 	}
+
+	SECTION("connections()") {
+		auto g = gdwg::Graph<int, int>{1, 2, 3, 4, 5};
+		g.insert_edge(1, 1, std::nullopt);
+		g.insert_edge(1, 1, 1);
+
+		g.insert_edge(1, 2, std::nullopt);
+		g.insert_edge(1, 2, 100);
+		g.insert_edge(1, 2, 1);
+
+		g.insert_edge(1, 3, std::nullopt);
+		g.insert_edge(1, 3, 100);
+		g.insert_edge(1, 3, 1);
+
+		g.insert_edge(1, 5, std::nullopt);
+		g.insert_edge(1, 5, 100);
+		g.insert_edge(1, 5, 1);
+
+		auto connections = g.connections(1);
+		CHECK(connections.size() == 4);
+		CHECK(connections[0] == 1);
+		CHECK(connections[1] == 2);
+		CHECK(connections[2] == 3);
+		CHECK(connections[3] == 5);
+
+		CHECK_THROWS_AS(g.connections(0), std::runtime_error);
+		CHECK_THROWS_WITH(g.connections(0),
+		                  "Cannot call gdwg::Graph<N, E>::connections if src doesn't exist in the graph");
+	}
 }
