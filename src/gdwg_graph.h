@@ -400,10 +400,14 @@ namespace gdwg {
 		auto const& edge_b = *b;
 		if (*edge_a.src_ == *edge_b.src_) {
 			if (*edge_a.dst_ == *edge_b.dst_) {
-				// it is actually UB where two edges of the same src and dst, within a graph, are both unweighted.
-				// However, if either is unweighted, then it is considered "smaller"
+				// 2 unweighted edges are equivalent, hence must return false, because set uses equivalence relation to
+				// determine if 2 things are the same,  i.e. if !comp(a, b) && !comp(b, a) then a == b
+				if (!edge_a.get_weight().has_value() && !edge_b.get_weight().has_value())
+					return false;
+
 				if (!edge_a.get_weight().has_value())
 					return true;
+
 				if (!edge_b.get_weight().has_value())
 					return false;
 
