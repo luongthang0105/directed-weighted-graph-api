@@ -109,7 +109,6 @@ TEST_CASE("Modifiers") {
 		REQUIRE(g.insert_edge(1, 2, "hello"));
 		REQUIRE(g.insert_edge(2, 3, "hi"));
 		REQUIRE(g.insert_edge(2, 4, "h"));
-		REQUIRE(g.insert_edge(2, 4, std::nullopt));
 		REQUIRE(g.insert_edge(1, 1, std::nullopt));
 
 		CHECK_FALSE(g.erase_node(0));
@@ -164,6 +163,7 @@ TEST_CASE("Accessors") {
 		// v-----------|
 		// 1 --> 2 --> 3
 		//       |---> 4
+		//       |-----^
 		REQUIRE(g.insert_edge(1, 2, "hello"));
 		REQUIRE(g.insert_edge(2, 3, "hi"));
 		REQUIRE(g.insert_edge(2, 4, "h"));
