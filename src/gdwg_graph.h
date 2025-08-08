@@ -94,6 +94,7 @@ namespace gdwg {
 		auto erase_node(N const& value) -> bool;
 		auto erase_edge(N const& src, N const& dst, std::optional<E> weight = std::nullopt) -> bool;
 		auto merge_replace_node(N const& old_data, N const& new_data) -> void;
+		auto clear() noexcept -> void;
 
 		// =================ACCESSORS===================
 		[[nodiscard]] auto is_node(N const& value) -> bool;
@@ -347,6 +348,12 @@ namespace gdwg {
 		}
 		erase_node(old_data);
 		return;
+	}
+
+	template<typename N, typename E>
+	auto Graph<N, E>::clear() noexcept -> void {
+		adjacency_list_.clear();
+		nodes_.clear();
 	}
 
 	// =================ACCESSORS===================

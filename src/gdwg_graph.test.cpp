@@ -265,6 +265,26 @@ TEST_CASE("Modifiers") {
 		CHECK(g.erase_edge(1, 1));
 		CHECK_FALSE(g.is_connected(1, 1));
 	}
+
+	SECTION("clear") {
+		auto g = gdwg::Graph<int, std::string>{1, 2, 3, 4};
+		//     v-----------|
+		//  |--1 --> 2 --> 3
+		//  |--^     |---> 4
+		//           |-----^
+		REQUIRE(g.insert_edge(1, 2, "hello"));
+		REQUIRE(g.insert_edge(2, 3, "hi"));
+		REQUIRE(g.insert_edge(2, 4, "h"));
+		REQUIRE(g.insert_edge(2, 4, std::nullopt));
+		REQUIRE(g.insert_edge(3, 1, std::nullopt));
+		REQUIRE(g.insert_edge(1, 1, std::nullopt));
+
+		CHECK(g.replace_node(1, 0));
+		CHECK(g.replace_node(2, 1));
+
+		g.clear();
+		CHECK(g.empty());
+	}
 }
 
 TEST_CASE("Accessors") {
