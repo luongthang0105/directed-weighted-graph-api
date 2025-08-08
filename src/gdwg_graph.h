@@ -119,7 +119,7 @@ namespace gdwg {
 		/**
 		 * Precondition: `is_node(value) == true`
 		 */
-		auto find_node_by_value(N const& value) -> const std::unique_ptr<N>&;
+		auto find_node_by_value(N const& value) const -> const std::unique_ptr<N>&;
 
 		using edge_set = std::set<std::unique_ptr<Edge<N, E>>, typename Edge<N, E>::UniquePtrEdgeComparator>;
 
@@ -204,7 +204,7 @@ namespace gdwg {
 	}
 
 	template<typename N, typename E>
-	auto Graph<N, E>::find_node_by_value(N const& value) -> const std::unique_ptr<N>& {
+	auto Graph<N, E>::find_node_by_value(N const& value) const -> const std::unique_ptr<N>& {
 		auto it = nodes_.find(std::make_unique<N>(value));
 		return *it;
 	}
