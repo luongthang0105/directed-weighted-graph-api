@@ -93,6 +93,7 @@ namespace gdwg {
 		auto replace_node(N const& old_data, N const& new_data) -> bool;
 		auto erase_node(N const& value) -> bool;
 		auto erase_edge(N const& src, N const& dst, std::optional<E> weight = std::nullopt) -> bool;
+		auto merge_replace_node(N const& old_data, N const& new_data) -> void;
 
 		// =================ACCESSORS===================
 		[[nodiscard]] auto is_node(N const& value) -> bool;
@@ -270,30 +271,9 @@ namespace gdwg {
 
 		insert_node(new_data);
 
-		for (auto& [node_ptr, edge_set] : adjacency_list_) {
-			for (auto it = edge_set.begin(); it != edge_set.end();) {
-				auto [src, dst] = (*it)->get_nodes();
-				auto weight = (*it)->get_weight();
-				auto new_src = src;
-				auto new_dst = dst;
+		merge_replace_node(old_data, new_data);
 
-				if (src == old_data) {
-					new_src = new_data;
-				}
-				if (dst == old_data) {
-					new_dst = new_data;
-				}
-
-				if (new_src != src || new_dst != dst) {
-					insert_edge(new_src, new_dst, weight);
-					it = edge_set.erase(it);
-				}
-				else {
-					it++;
-				}
-			}
-		}
-		return erase_node(old_data);
+		return true;
 	}
 
 	template<typename N, typename E>
@@ -331,6 +311,42 @@ namespace gdwg {
 			                     return (*edge).get_nodes() == std::make_pair(src, dst) && (*edge).get_weight() == weight;
 		                     })
 		       != 0;
+	}
+
+	template<typename N, typename E>
+	auto Graph<N, E>::merge_replace_node(N const& old_data, N const& new_data) -> void {
+		if (!is_node(new_data) || !is_node(old_data)) {
+			throw std::runtime_error("Cannot call gdwg::Graph<N, E>::merge_replace_node on old or new data if they "
+			                         "don't exist in the graph");
+		}
+		if (old_data == new_data)
+			return;
+
+		for (auto& [node_ptr, edge_set] : adjacency_list_) {
+			for (auto it = edge_set.begin(); it != edge_set.end();) {
+				auto [src, dst] = (*it)->get_nodes();
+				auto weight = (*it)->get_weight();
+				auto new_src = src;
+				auto new_dst = dst;
+
+				if (src == old_data) {
+					new_src = new_data;
+				}
+				if (dst == old_data) {
+					new_dst = new_data;
+				}
+
+				if (new_src != src || new_dst != dst) {
+					insert_edge(new_src, new_dst, weight);
+					it = edge_set.erase(it);
+				}
+				else {
+					it++;
+				}
+			}
+		}
+		erase_node(old_data);
+		return;
 	}
 
 	// =================ACCESSORS===================
