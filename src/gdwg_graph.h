@@ -177,19 +177,18 @@ namespace gdwg {
 			adj_list_iter_t adj_list_iter_end_;
 			std::optional<edge_iter_t> edge_iter_cur_;
 		};
-
-		auto swap(Graph& other) noexcept -> void;
-
-		/**
-		 * Precondition: `is_node(value) == true`
-		 */
-		auto find_node_by_value(N const& value) const -> const std::unique_ptr<N>&;
-
-		using edge_set = std::set<std::unique_ptr<Edge<N, E>>, typename Edge<N, E>::UniquePtrEdgeComparator>;
-
-		std::set<std::unique_ptr<N>, UniquePtrValueComparator> nodes_;
-		std::map<N*, edge_set, RawPtrValueComparator> adjacency_list_;
+		// =================ITERATOR ACCESS===================
+		[[nodiscard]] auto begin() const -> typename gdwg::Graph<N, E>::iterator {
+			return iterator{adjacency_list_.begin(),
+			                adjacency_list_.begin(),
+			                adjacency_list_.end(),
+			                std::make_optional(adjacency_list_.begin()->second.begin())};
+		};
+		[[nodiscard]] auto end() const -> typename gdwg::Graph<N, E>::iterator {
+			return iterator{adjacency_list_.end(), adjacency_list_.begin(), adjacency_list_.end(), std::nullopt};
+		};
 	};
+
 } // namespace gdwg
 
 namespace gdwg {
