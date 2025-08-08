@@ -675,6 +675,19 @@ namespace gdwg {
 	}
 
 	template<typename N, typename E>
+	auto Graph<N, E>::iterator::operator--(int) -> iterator {
+		auto temp = *this;
+		--*this;
+		return temp;
+	}
+
+	template<typename N, typename E>
+	auto Graph<N, E>::iterator::operator==(iterator const& other) const noexcept -> bool {
+		return edge_iter_cur_ == other.edge_iter_cur_ && adj_list_iter_cur_ == other.adj_list_iter_cur_;
+	}
+
+	// =====================EDGES===================
+	template<typename N, typename E>
 	Edge<N, E>::Edge(N const& src, N const& dst)
 	: src_{&src}
 	, dst_{&dst} {}
