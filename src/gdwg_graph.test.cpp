@@ -142,6 +142,41 @@ TEST_CASE("Modifiers") {
 		CHECK(g.is_connected(1, 4));
 	}
 
+	SECTION("merge_replace_node") {
+		SECTION("Test 1") {
+			auto g = gdwg::Graph<int, std::string>{1, 2, 3, 4};
+			//     v-----------|
+			//  |--1 --> 2 --> 3
+			//  |--^     |---> 4
+			//           |-----^
+			REQUIRE(g.insert_edge(1, 2, "hello"));
+			REQUIRE(g.insert_edge(2, 3, "hi"));
+			REQUIRE(g.insert_edge(2, 4, "h"));
+			REQUIRE(g.insert_edge(2, 4, std::nullopt));
+			REQUIRE(g.insert_edge(3, 1, std::nullopt));
+			REQUIRE(g.insert_edge(1, 1, std::nullopt));
+
+			// Old data / new data not exist
+			CHECK_THROWS_AS(g.merge_replace_node(0, 1), std::runtime_error);
+			CHECK_THROWS_WITH(g.merge_replace_node(0, 1),
+			                  "Cannot call gdwg::Graph<N, E>::merge_replace_node on old or new data if they don't "
+			                  "exist in the graph");
+			CHECK_THROWS_WITH(g.merge_replace_node(1, 0),
+			                  "Cannot call gdwg::Graph<N, E>::merge_replace_node on old or new data if they don't "
+			                  "exist in the graph");
+
+			// merge node 1 to 3
+			CHECK_NOTHROW(g.merge_replace_node(1, 3));
+
+			//           v-----|--|
+			//           2 --> 3<--
+			//           |---> 4
+			//           |-----^
+			CHECK(g.is_connected(3, 3));
+			CHECK(g.is_connected(3, 2));
+			CHECK(g.is_connected(2, 3));
+		}
+
 	SECTION("erase_node") {
 		auto g = gdwg::Graph<int, std::string>{1, 2, 3, 4};
 		// v-----------|
