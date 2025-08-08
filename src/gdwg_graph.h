@@ -103,14 +103,14 @@ namespace gdwg {
 		[[nodiscard]] auto nodes() const -> std::vector<N>;
 		[[nodiscard]] auto edges(N const& src, N const& dst) const -> std::vector<std::unique_ptr<Edge<N, E>>>;
 		// [[nodiscard]] auto find(N const& src, N const& dst, std::optional<E> weight = std::nullopt) -> iterator;
-		[[nodiscard]] auto connections(N const& src) -> std::vector<N>;
+		[[nodiscard]] auto connections(N const& src) const -> std::vector<N>;
 
 		// =================COMPARISONS===================
 		[[nodiscard]] auto operator==(Graph const& other) const -> bool;
 
 		// =================EXTRACTOR===================
 		template<typename TEMP_N, typename TEMP_E>
-		friend auto operator<<(std::ostream& os, Graph<TEMP_N, TEMP_E> const& g) -> std::ostream&;
+		friend auto operator<<(std::ostream& os, Graph<TEMP_N, TEMP_E> const& g) noexcept -> std::ostream&;
 
 	 private:
 		struct UniquePtrValueComparator {
@@ -438,7 +438,7 @@ namespace gdwg {
 	}
 
 	template<typename N, typename E>
-	auto Graph<N, E>::connections(N const& src) -> std::vector<N> {
+	auto Graph<N, E>::connections(N const& src) const -> std::vector<N> {
 		if (!is_node(src)) {
 			throw std::runtime_error("Cannot call gdwg::Graph<N, E>::connections if src doesn't exist in the "
 			                         "graph");
@@ -499,7 +499,7 @@ namespace gdwg {
 
 	// =================EXTRACTOR===================
 	template<typename N, typename E>
-	auto operator<<(std::ostream& os, Graph<N, E> const& g) -> std::ostream& {
+	auto operator<<(std::ostream& os, Graph<N, E> const& g) noexcept -> std::ostream& {
 		for (auto const& [node_ptr, edge_set] : g.adjacency_list_) {
 			os << *node_ptr << " (\n";
 			for (auto const& edge : edge_set) {
