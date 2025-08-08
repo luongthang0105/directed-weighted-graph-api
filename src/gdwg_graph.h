@@ -69,6 +69,28 @@ namespace gdwg {
 
 	template<typename N, typename E>
 	class Graph {
+	 private:
+		struct UniquePtrValueComparator {
+			auto operator()(const std::unique_ptr<N>& a, const std::unique_ptr<N>& b) const -> bool;
+		};
+
+		struct RawPtrValueComparator {
+			auto operator()(const N* a, const N* b) const -> bool;
+		};
+
+		auto swap(Graph& other) noexcept -> void;
+
+		/**
+		 * Precondition: `is_node(value) == true`
+		 */
+		auto find_node_by_value(N const& value) const -> const std::unique_ptr<N>&;
+
+		using edge_set = std::set<std::unique_ptr<Edge<N, E>>, typename Edge<N, E>::UniquePtrEdgeComparator>;
+		using adj_list = std::map<N*, edge_set, RawPtrValueComparator>;
+
+		std::set<std::unique_ptr<N>, UniquePtrValueComparator> nodes_;
+		adj_list adjacency_list_;
+
 	 public:
 		Graph();
 
