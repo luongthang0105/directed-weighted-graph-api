@@ -404,3 +404,53 @@ TEST_CASE("Accessors") {
 		                  "Cannot call gdwg::Graph<N, E>::connections if src doesn't exist in the graph");
 	}
 }
+
+TEST_CASE("Extractor") {
+	using graph = gdwg::Graph<int, int>;
+	auto g = graph{1, 2, 3, 4, 5, 6};
+	g.insert_edge(4, 1, -4);
+	g.insert_edge(3, 2, 2);
+	g.insert_edge(2, 4, std::nullopt);
+	g.insert_edge(2, 4, 2);
+	g.insert_edge(2, 1, 1);
+	g.insert_edge(4, 1, std::nullopt);
+	g.insert_edge(6, 2, 5);
+	g.insert_edge(6, 3, 10);
+	g.insert_edge(1, 5, -1);
+	g.insert_edge(3, 6, -8);
+	g.insert_edge(4, 5, 3);
+	g.insert_edge(5, 2, std::nullopt);
+
+	g.insert_node(64);
+
+	auto out = std::ostringstream{};
+	out << g;
+	auto const expected_output = std::string_view(R"(1 (
+  1 -> 5 | W | -1
+)
+2 (
+  2 -> 1 | W | 1
+  2 -> 4 | U
+  2 -> 4 | W | 2
+)
+3 (
+  3 -> 2 | W | 2
+  3 -> 6 | W | -8
+)
+4 (
+  4 -> 1 | U
+  4 -> 1 | W | -4
+  4 -> 5 | W | 3
+)
+5 (
+  5 -> 2 | U
+)
+6 (
+  6 -> 2 | W | 5
+  6 -> 3 | W | 10
+)
+64 (
+)
+)");
+	CHECK(out.str() == expected_output);
+}
