@@ -1,6 +1,7 @@
 #ifndef GDWG_GRAPH_H
 #define GDWG_GRAPH_H
 
+#include <algorithm>
 #include <map>
 #include <memory>
 #include <optional>
@@ -91,6 +92,7 @@ namespace gdwg {
 		// =================ACCESSORS===================
 		[[nodiscard]] auto is_node(N const& value) -> bool;
 		[[nodiscard]] auto empty() -> bool;
+		[[nodiscard]] auto is_connected(N const& src, N const& dst) -> bool;
 
 		// =================COMPARISONS===================
 		[[nodiscard]] auto operator==(Graph const& other) const -> bool;
@@ -257,6 +259,26 @@ namespace gdwg {
 	template<typename N, typename E>
 	[[nodiscard]] auto Graph<N, E>::empty() -> bool {
 		return nodes_.size() == 0 && adjacency_list_.size() == 0;
+	}
+
+	template<typename N, typename E>
+	auto Graph<N, E>::is_connected(N const& src, N const& dst) -> bool {
+		if (!is_node(src) || !is_node(dst)) {
+			throw std::runtime_error("Cannot call gdwg::Graph<N, E>::is_connected if src or dst node don't exist in "
+			                         "the graph");
+		}
+
+		auto& src_ptr = find_node_by_value(src);
+		auto& edges_from_src = adjacency_list_.at(src_ptr.get());
+
+		return std::find_if(edges_from_src.begin(),
+		                    edges_from_src.end(),
+		                    [&dst](Edge<N, E> const& edge) {
+			                    N edge_dst = edge.get_nodes().second;
+			                    if (dst == edge_dst)
+				                    return true;
+		                    })
+		       != edges_from_src.end();
 	}
 
 	// =================COMPARISONS===================
