@@ -454,3 +454,44 @@ TEST_CASE("Extractor") {
 )");
 	CHECK(out.str() == expected_output);
 }
+
+TEST_CASE("Iterator") {
+	using graph = gdwg::Graph<int, int>;
+	SECTION("Small") {
+		auto g = graph{1, 2};
+		g.insert_edge(1, 2);
+
+		auto it = g.begin();
+		CHECK((*it).from == 1);
+		CHECK((*it).to == 2);
+		CHECK((*it).weight == std::nullopt);
+		++it;
+		++it;
+		CHECK(it == g.end());
+	}
+	SECTION("operator--") {
+		auto g = graph{1, 2, 3};
+		g.insert_edge(1, 2);
+		g.insert_edge(3, 2);
+		g.insert_edge(3, 1);
+
+		auto it = g.begin();
+		CHECK((*it).from == 1);
+		CHECK((*it).to == 2);
+		CHECK((*it).weight == std::nullopt);
+		++it;
+
+		CHECK((*it).from == 3);
+		CHECK((*it).to == 1);
+		CHECK((*it).weight == std::nullopt);
+		++it;
+
+		CHECK((*it).from == 3);
+		CHECK((*it).to == 2);
+		CHECK((*it).weight == std::nullopt);
+
+		--it;
+		--it;
+		CHECK((*it).from == 1);
+		CHECK((*it).to == 2);
+	}
