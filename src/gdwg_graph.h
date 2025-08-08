@@ -93,7 +93,7 @@ namespace gdwg {
 		[[nodiscard]] auto empty() -> bool;
 
 		// =================COMPARISONS===================
-		[[nodiscard]] auto operator==(Graph const& other) -> bool;
+		[[nodiscard]] auto operator==(Graph const& other) const -> bool;
 
 	 private:
 		struct UniquePtrValueComparator {
@@ -261,7 +261,7 @@ namespace gdwg {
 
 	// =================COMPARISONS===================
 	template<typename N, typename E>
-	[[nodiscard]] auto Graph<N, E>::operator==(Graph const& other) -> bool {
+	[[nodiscard]] auto Graph<N, E>::operator==(Graph<N, E> const& other) const -> bool {
 		if (nodes_.size() != other.nodes_.size())
 			return false;
 		if (adjacency_list_.size() != other.adjacency_list_.size())
