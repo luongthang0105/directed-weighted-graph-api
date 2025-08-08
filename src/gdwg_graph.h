@@ -108,6 +108,10 @@ namespace gdwg {
 		// =================COMPARISONS===================
 		[[nodiscard]] auto operator==(Graph const& other) const -> bool;
 
+		// =================EXTRACTOR===================
+		template<typename TEMP_N, typename TEMP_E>
+		friend auto operator<<(std::ostream& os, Graph<TEMP_N, TEMP_E> const& g) -> std::ostream&;
+
 	 private:
 		struct UniquePtrValueComparator {
 			auto operator()(const std::unique_ptr<N>& a, const std::unique_ptr<N>& b) const -> bool;
@@ -491,6 +495,19 @@ namespace gdwg {
 			}
 		}
 		return true;
+	}
+
+	// =================EXTRACTOR===================
+	template<typename N, typename E>
+	auto operator<<(std::ostream& os, Graph<N, E> const& g) -> std::ostream& {
+		for (auto const& [node_ptr, edge_set] : g.adjacency_list_) {
+			os << *node_ptr << " (\n";
+			for (auto const& edge : edge_set) {
+				os << "  " << edge->print_edge() << '\n';
+			}
+			os << ")\n";
+		}
+		return os;
 	}
 
 	template<typename N, typename E>
