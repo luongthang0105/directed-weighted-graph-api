@@ -134,13 +134,48 @@ namespace gdwg {
 		template<typename TEMP_N, typename TEMP_E>
 		friend auto operator<<(std::ostream& os, Graph<TEMP_N, TEMP_E> const& g) noexcept -> std::ostream&;
 
-	 private:
-		struct UniquePtrValueComparator {
-			auto operator()(const std::unique_ptr<N>& a, const std::unique_ptr<N>& b) const -> bool;
-		};
+		class iterator {
+		 public:
+			using value_type = struct {
+				N from;
+				N to;
+				std::optional<E> weight;
+			};
+			using reference = value_type;
+			using pointer = void;
+			using difference_type = std::ptrdiff_t;
+			using iterator_category = std::bidirectional_iterator_tag;
 
-		struct RawPtrValueComparator {
-			auto operator()(const N* a, const N* b) const -> bool;
+			using adj_list_iter_t = typename adj_list::const_iterator;
+			using edge_iter_t = typename edge_set::const_iterator;
+
+			// Iterator constructor
+			iterator() = default;
+
+			// Iterator source
+			auto operator*() -> reference;
+
+			// Iterator traversal
+			auto operator++() -> iterator&;
+			auto operator++(int) -> iterator;
+			auto operator--() -> iterator&;
+			auto operator--(int) -> iterator;
+
+			// Iterator comparison
+			auto operator==(iterator const& other) const noexcept -> bool;
+
+			iterator(adj_list_iter_t adj_list_iter_cur,
+			         adj_list_iter_t adj_list_iter_begin,
+			         adj_list_iter_t adj_list_iter_end,
+			         std::optional<edge_iter_t> edge_iter);
+
+		 private:
+			auto get_edge_iter_end() -> std::optional<edge_iter_t>;
+			auto get_edge_iter_begin() -> std::optional<edge_iter_t>;
+			adj_list_iter_t adj_list_iter_cur_;
+			adj_list_iter_t adj_list_iter_begin_;
+			adj_list_iter_t adj_list_iter_end_;
+			std::optional<edge_iter_t> edge_iter_cur_;
 		};
 
 		auto swap(Graph& other) noexcept -> void;
