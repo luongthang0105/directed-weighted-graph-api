@@ -43,7 +43,7 @@ namespace gdwg {
 	class WeightedEdge : public Edge<N, E> {
 	 public:
 		WeightedEdge(N const& src, N const& dst, E const& weight);
-		WeightedEdge(WeightedEdge const& other);
+		explicit WeightedEdge(WeightedEdge const& other);
 
 		auto print_edge() -> std::string override;
 		auto is_weighted() -> bool override;
@@ -57,7 +57,7 @@ namespace gdwg {
 	class UnweightedEdge : public Edge<N, E> {
 	 public:
 		UnweightedEdge(N const& src, N const& dst);
-		UnweightedEdge(UnweightedEdge const& other);
+		explicit UnweightedEdge(UnweightedEdge const& other);
 
 		auto print_edge() -> std::string override;
 		auto is_weighted() -> bool override;
@@ -95,6 +95,7 @@ namespace gdwg {
 		[[nodiscard]] auto empty() -> bool;
 		[[nodiscard]] auto is_connected(N const& src, N const& dst) -> bool;
 		[[nodiscard]] auto nodes() -> std::vector<N>;
+		[[nodiscard]] auto edges(N const& src, N const& dst) -> std::vector<std::unique_ptr<Edge<N, E>>>;
 
 		// =================COMPARISONS===================
 		[[nodiscard]] auto operator==(Graph const& other) const -> bool;
@@ -290,6 +291,43 @@ namespace gdwg {
 			returned_nodes.push_back(*node);
 		}
 		return returned_nodes;
+	}
+
+	template<typename N, typename E>
+	auto Graph<N, E>::edges(N const& src, N const& dst) -> std::vector<std::unique_ptr<Edge<N, E>>> {
+		if (!is_node(src) || !is_node(dst)) {
+			throw std::runtime_error("Cannot call gdwg::Graph<N, E>::is_connected if src or dst node don't exist in "
+			                         "the graph");
+		}
+
+		auto& src_ptr = find_node_by_value(src); // O(log(n))
+		auto& edges_from_src = adjacency_list_.at(src_ptr.get()); // O(log(n))
+
+		auto is_matched_dst = [&dst](auto const& edge) {
+			N edge_dst = (*edge).get_nodes().second;
+			return dst == edge_dst;
+		};
+
+		auto first_occurrence_it = std::find_if(edges_from_src.begin(), edges_from_src.end(), is_matched_dst); // O(e)
+
+		auto returned_edges = std::vector<std::unique_ptr<Edge<N, E>>>{};
+		for (auto& it = first_occurrence_it; it != edges_from_src.end(); it++) { // O(e)
+			std::unique_ptr<Edge<N, E>> const& edge_ptr = *it;
+			if (is_matched_dst(edge_ptr)) {
+				if (edge_ptr->is_weighted()) {
+					auto const& temp = static_cast<WeightedEdge<N, E>&>(*edge_ptr);
+					returned_edges.push_back(std::make_unique<WeightedEdge<N, E>>(temp));
+				}
+				else {
+					auto const& temp = static_cast<UnweightedEdge<N, E>&>(*edge_ptr);
+					returned_edges.push_back(std::make_unique<UnweightedEdge<N, E>>(temp));
+				}
+			}
+			else {
+				break;
+			}
+		}
+		return returned_edges;
 	}
 
 	// =================COMPARISONS===================
