@@ -256,7 +256,7 @@ namespace gdwg {
 	// =================ACCESSORS===================
 	template<typename N, typename E>
 	[[nodiscard]] auto Graph<N, E>::is_node(N const& value) -> bool {
-		return nodes_.contains(std::make_unique<N>(value));
+		return nodes_.contains(std::make_unique<N>(value)); // O(log(n)) because nodes_ is a set.
 	}
 
 	template<typename N, typename E>
@@ -296,8 +296,8 @@ namespace gdwg {
 	template<typename N, typename E>
 	auto Graph<N, E>::edges(N const& src, N const& dst) -> std::vector<std::unique_ptr<Edge<N, E>>> {
 		if (!is_node(src) || !is_node(dst)) {
-			throw std::runtime_error("Cannot call gdwg::Graph<N, E>::is_connected if src or dst node don't exist in "
-			                         "the graph");
+			throw std::runtime_error("Cannot call gdwg::Graph<N, E>::edges if src or dst node don't exist in the "
+			                         "graph");
 		}
 
 		auto& src_ptr = find_node_by_value(src); // O(log(n))
@@ -425,7 +425,7 @@ namespace gdwg {
 	template<typename N, typename E>
 	WeightedEdge<N, E>::WeightedEdge(WeightedEdge const& other)
 	: Edge<N, E>(other)
-	, weight_{std::make_unique<E>(other.weight_)} {}
+	, weight_{std::make_unique<E>(*other.weight_)} {}
 
 	template<typename N, typename E>
 	auto WeightedEdge<N, E>::print_edge() -> std::string {

@@ -93,6 +93,13 @@ TEST_CASE("Modifiers") {
 		g.insert_node(n);
 		CHECK(g.is_node(n));
 	}
+
+	SECTION("insert_edge") { // checks for duplicate edges
+		auto g = gdwg::Graph<int, std::string>{};
+		auto n = 5;
+		g.insert_node(n);
+		CHECK(g.is_node(n));
+	}
 }
 
 TEST_CASE("Accessors") {
@@ -128,7 +135,7 @@ TEST_CASE("Accessors") {
 			CHECK_THROWS_WITH(g.is_connected(-1, 6), error_msg);
 		}
 	}
-	SECTION("nodes") {
+	SECTION("nodes()") {
 		std::vector<std::string> temp;
 		{
 			auto g = gdwg::Graph<std::string, std::string>{"1", "2", "3", "4"};
@@ -143,5 +150,42 @@ TEST_CASE("Accessors") {
 		CHECK(temp[1] == "2");
 		CHECK(temp[2] == "3");
 		CHECK(temp[3] == "4");
+	}
+
+	SECTION("edge()") {
+		auto g = gdwg::Graph<int, int>{1, 2, 3};
+		/**
+		 * ---v ---v
+		 * |--1--> 2
+		 * ---^ ---^
+		 */
+		g.insert_edge(1, 2, 3);
+		g.insert_edge(1, 2, 4);
+		g.insert_edge(1, 2, std::nullopt);
+		g.insert_edge(1, 1, std::nullopt);
+		g.insert_edge(1, 1, 1);
+		auto edges_from_1_to_1 = g.edges(1, 1);
+		CHECK(edges_from_1_to_1.size() == 2);
+
+		CHECK((*edges_from_1_to_1[0]).get_weight() == std::nullopt);
+		CHECK((*edges_from_1_to_1[0]).get_nodes() == std::make_pair(1, 1));
+
+		CHECK((*edges_from_1_to_1[1]).get_weight() == 1);
+		CHECK((*edges_from_1_to_1[1]).get_nodes() == std::make_pair(1, 1));
+
+		auto edges_from_1_to_2 = g.edges(1, 2);
+
+		CHECK((*edges_from_1_to_2[0]).get_weight() == std::nullopt);
+		CHECK((*edges_from_1_to_2[0]).get_nodes() == std::make_pair(1, 2));
+
+		CHECK((*edges_from_1_to_2[1]).get_weight() == 3);
+		CHECK((*edges_from_1_to_2[1]).get_nodes() == std::make_pair(1, 2));
+
+		CHECK((*edges_from_1_to_2[2]).get_weight() == 4);
+		CHECK((*edges_from_1_to_2[2]).get_nodes() == std::make_pair(1, 2));
+
+		CHECK_THROWS_AS(g.edges(1, 4), std::runtime_error);
+		CHECK_THROWS_WITH(g.edges(1, 4),
+		                  "Cannot call gdwg::Graph<N, E>::edges if src or dst node don't exist in the graph");
 	}
 }
