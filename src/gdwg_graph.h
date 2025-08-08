@@ -591,6 +591,41 @@ namespace gdwg {
 		return *edge_a.src_ < *edge_b.src_;
 	}
 
+	// =====================ITERATOR===================
+	template<typename N, typename E>
+	Graph<N, E>::iterator::iterator(adj_list_iter_t adj_list_iter_cur,
+	                                adj_list_iter_t adj_list_iter_begin,
+	                                adj_list_iter_t adj_list_iter_end,
+	                                std::optional<edge_iter_t> edge_iter_cur)
+	: adj_list_iter_cur_{adj_list_iter_cur}
+	, adj_list_iter_begin_{adj_list_iter_begin}
+	, adj_list_iter_end_{adj_list_iter_end}
+	, edge_iter_cur_{edge_iter_cur} {}
+
+	template<typename N, typename E>
+	auto Graph<N, E>::iterator::get_edge_iter_end() -> std::optional<edge_iter_t> {
+		if (adj_list_iter_cur_ != adj_list_iter_end_) {
+			return adj_list_iter_cur_->second.end();
+		}
+		return std::nullopt;
+	}
+
+	template<typename N, typename E>
+	auto Graph<N, E>::iterator::get_edge_iter_begin() -> std::optional<edge_iter_t> {
+		if (adj_list_iter_cur_ != adj_list_iter_end_) {
+			return adj_list_iter_cur_->second.begin();
+		}
+		return std::nullopt;
+	}
+
+	template<typename N, typename E>
+	auto Graph<N, E>::iterator::operator*() -> reference {
+		std::unique_ptr<Edge<N, E>> const& edge = *(edge_iter_cur_.value());
+		auto [src, dst] = edge->get_nodes();
+		auto weight = edge->get_weight();
+		return reference{.from = src, .to = dst, .weight = weight};
+	}
+
 	template<typename N, typename E>
 	Edge<N, E>::Edge(N const& src, N const& dst)
 	: src_{&src}
