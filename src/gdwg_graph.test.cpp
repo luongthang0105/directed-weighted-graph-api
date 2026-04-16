@@ -543,3 +543,6 @@ TEST_CASE("Iterator") {
 			CHECK((*it).weight == 2);
 
 			it++;
+		}
+	}
+}
