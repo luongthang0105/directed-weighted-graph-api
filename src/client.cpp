@@ -19,6 +19,8 @@ auto main() -> int {
 
 	g.insert_edge("are", "you?", 3);
 
+	std::cout << "Printing the state of the graph. Note that edges are printed in the ascending order of (src, dst, "
+	             "weight).\n";
 	std::cout << g << "\n";
 
 	auto g2 = gdwg::Graph<std::string, int>(g);
